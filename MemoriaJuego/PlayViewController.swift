@@ -8,22 +8,25 @@
  import UIKit
 class PlayViewController: UIViewController {
     
+    /**UIimage de la imagen a memorizar*/
     @IBOutlet weak var ActiveImage: UIImageView!
     
+    /**Dejo por defecto el nivel a 0 en caso de que no se haya pasado el nivel desde alguna de las pantallas: Pantalla principal,Resultado del jugador*/
     public var level = 0
     
     var allImages = [String]()
-    var toCompareResult = [String]() //Copia del array con los resultados de la
-    var source = "" //Imagen actual mostrandose//
+    //Copia del array allImages, para enviar a la pantalla de seleccion de las imagenes.
+    var toCompareResult = [String]()
+    //nombre de la imagen actual mostrandose//
+    var source = ""
+    /**Tiempo para la funcion TImer por defecto para la presentacion de las imagenes a memorizar*/
     var delay = 1.0
    
     
     
  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
       if segue.identifier == "selectOption"{
-        print(toCompareResult)
           let selectController = segue.destination as! SelectViewController
-        //Continuo por aqui, pasar el nivel actual//
         selectController.level = level
         selectController.checkOptions = toCompareResult
       }
@@ -33,7 +36,7 @@ class PlayViewController: UIViewController {
         super.viewDidLoad()
 
         
-        //Logica del juego debe de ir aqui//
+      /**Dependiendo del nivel, mas imagenes tendra que memorizar el jugador con su tiempo de espera entre imagenes*/
         switch level {
         case 1:
            allImages = ["image1","image2","image3"]
@@ -46,23 +49,34 @@ class PlayViewController: UIViewController {
          delay = 0.5
         case 4:
             allImages = ["image1","image2","image3","image4","image5","image6"]
-            delay = 0.3
+            delay = 0.5
         case 5:
             allImages = ["image1","image2","image3","image4","image5","image6","image7","image8"]
             delay = 1
+       case 6:
+            allImages = ["image1","image2","image3","image4","image5","image6","image7","image8","image9"]
+            delay = 0.8
+        case 7:
+            allImages = ["image1","image2","image3","image4","image5","image6","image7","image8","image9","image10"]
+            delay = 0.7
+        case 8:
+            allImages = ["image1","image2","image3","image4","image5","image6","image7","image8","image9","image10","image11"]
+            delay = 0.7
         default:
-           print("no hago nada")
+            break;
         }
         
-        toCompareResult = allImages
         
+        /**Para mostrar la imagene a memorizar a partir de la lista allImages, todo ello con un tiempo de espera dado que se repetira hasta que no quede ninguna imagen por mostrar, entonces pasará automaticamente a la siguiente pantalla.*/
         Timer.scheduledTimer(withTimeInterval: delay, repeats: true){timer in
             if(self.allImages.count == 0){
                 timer.invalidate()
                 self.performSegue(withIdentifier: "selectOption", sender: self)
                 
             }else{
+                /**Escoge la imagen a mostrar aleatoriamente,luego se añade a la lista toCompareResult para la siguiente pantalla.*/
                 self.source = self.getPosRandom()
+                self.toCompareResult.append(self.source);
                 self.ActiveImage.image = UIImage.init(imageLiteralResourceName: self.source)
                
             }
@@ -79,18 +93,19 @@ class PlayViewController: UIViewController {
 
             // Sacar una clave aleatoria del array
             let arrayKey = Int(arc4random_uniform(UInt32(allImages.count)))
-            print(arrayKey)
+           
            
             let randImage = allImages[arrayKey]
-            print(randImage)
+            
             //Eliminar el elemento del array para que no vuelva a repetirse
             allImages.remove(at: arrayKey)
         return randImage
     }
+    
+    /**Para evitar comportamientos extraños a la hora de pintar la pantalla*/
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        print("M ostrado vista1")
-        print("Nivel actual: \(level)")
+        
     }
     
   

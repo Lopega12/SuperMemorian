@@ -5,17 +5,25 @@
 //  Created by Loren on 22/10/2019.
 //  Copyright © 2019 Loren. All rights reserved.
 //
+/**
+ Controlador para la pantalla de seleccionar 
+ */
 import UIKit
 
 class SelectViewController: UIViewController,UICollectionViewDataSource, UICollectionViewDelegate{
+    /*Array con las imagenes posibles que el jugador puede escoger**/
     var options = [String]()
+    /*Por defecto pongo el nivel 0 para asegurarme de que no salta a un nivel superior o no muestre nada si hay algun error**/
     public var level = 0;
     public var checkOptions = [String]() //Coleccion de las imagenes mostradas en el segue anterior
-    /*Cosas para el boton flotante**/
+    /**
+        Declaracion del boton flotante.
+     */
        var roundButton = UIButton()
     
+    //CollectionView con las imagenes que puede escoger el jugador
     @IBOutlet weak var gridOptions: UICollectionView!
-    
+     //CollectionView con las imagenes selccionadas por el jugador
     @IBOutlet weak var gridSelected: UICollectionView!
     
     var imagesSelected = [String]() //Coleccion de las imagenes seleccionadas
@@ -29,17 +37,20 @@ class SelectViewController: UIViewController,UICollectionViewDataSource, UIColle
        
     }
     
-
+/**      Sacar el nombre de la imagen a a partir de un array con los nombres de cada imagen, cada imagen ira en una posicion determinada del content view.
+ */
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
+        /**
+         Distiguir que CollectionView es el seleccionado, una vez distinguido se accede al contenido de la celda para sacar la imagen,eliminar/añadir del la lista correspondiente y despues refrescar los dos collectionView todo ello accediendo al nombre de la imagen en la celda correspondiente.
+         */
         if collectionView == gridOptions{
         
-//        Sacar el nombre de la imagen a a partir de un array con los nombres de cada imagen, cada imagen ira en una posicion determinada del content view.
         let image = options[indexPath.row]
         let indentifierCell = "CellSel"
-//        acceder a la clase asignada al contenido de la celda, este caso es solo una imagen.
+            
         let cell = self.gridOptions.dequeueReusableCell(withReuseIdentifier: indentifierCell , for: indexPath) as! OptionsCollectionCell
-//        Asignar la imagen a la celda a partir de un nombre
+            
          cell.imagenCelda.image = UIImage.init(imageLiteralResourceName: image)
         return cell
             
@@ -47,15 +58,18 @@ class SelectViewController: UIViewController,UICollectionViewDataSource, UIColle
             
             let image = imagesSelected[indexPath.row]
                     let indentifierCell = "SelCell"
-            //        acceder a la clase asignada al contenido de la celda, este caso es solo una imagen.
+            
                     let cell = self.gridSelected.dequeueReusableCell(withReuseIdentifier: indentifierCell , for: indexPath) as! SelectedCollectionCell
-            //        Asignar la imagen a la celda a partir de un nombre
+        
             cell.SelImage.image = UIImage.init(imageLiteralResourceName: image)
             return cell
         }
         
     }
     
+    /**
+     Sacar la imagen del CollectionView con las opciones al CollectionView  de las imagenes elegidas por el jugador y viceversa
+     */
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if(collectionView == gridOptions){
             print(imagesSelected.count)
@@ -63,17 +77,13 @@ class SelectViewController: UIViewController,UICollectionViewDataSource, UIColle
             
                 let nameImage = options[indexPath.row]
                 options.remove(at: indexPath.row)
-                gridSelected.reloadData()
-                
                 imagesSelected.append(nameImage)
-                gridOptions.reloadData()
-                  print("Images seleccionaas: ",imagesSelected.count)
                 if (imagesSelected.count == checkOptions.count){
-                  
-                    roundButton.isHidden = false
+                    self.roundButton.isHidden = false
                 }
-                
-                
+                gridSelected.reloadData()
+                gridOptions.reloadData()
+                print("Images seleccionaas: ",imagesSelected.count)
                 
             }else{
                 print("No puedes seleccionar mas")
@@ -90,6 +100,9 @@ class SelectViewController: UIViewController,UICollectionViewDataSource, UIColle
         
     }
     
+    /**
+     Segun el nivel enviado por la pantalla de ver las imagenes a memorizar, la lista con las imagenes que puede seleccionar el jugador, varía
+     */
     func checkLevel(level: Int){
         switch level {
          case 1:
@@ -106,57 +119,66 @@ class SelectViewController: UIViewController,UICollectionViewDataSource, UIColle
             break
         }
     }
+    
+    /**Realiza el pintado del segue, se llama antes de viewDidLoad*/
     override func viewDidAppear(_ animated: Bool) {
           super.viewDidAppear(animated)
-          print("Mostrado vista al grid")
       }
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
         /**
-                    Cosas para el boton flotante a la hora de mostrarse
+                    Opciones para el boton flotante como estilos,constraints,posicion,tamaño,fuente....
          */
         self.roundButton = UIButton(type: .custom)
-        self.roundButton.setTitleColor(UIColor.orange, for: .normal)
+        roundButton.isHidden = true
+        self.roundButton.setTitleColor(UIColor.white, for: .normal)
         self.roundButton.addTarget(self, action: #selector(ButtonClick(_:)), for: UIControl.Event.touchUpInside)
+        self.roundButton.setTitle("->", for: .normal)
+        self.roundButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 50)
         self.view.addSubview(roundButton)
+        self.view.bringSubviewToFront(roundButton)
+        
         
         checkLevel(level: level)
+        /**Asignacion de las imagenes a los CollectionView y Permitir la seleccionMultiple de celdas*/
         gridOptions.dataSource = self
         gridOptions.delegate = self
         gridOptions.allowsMultipleSelection = true
         gridSelected.dataSource = self
         gridSelected.delegate = self
         
-         /*playButton.backgroundColor = UIColor.clear*/
-        // Do any additional setup after loading the view.
+         
     }
+    
+    /**Pintado del boton por cada refresco de la pantalla*/
     override func viewWillLayoutSubviews() {
-
+        super.viewWillLayoutSubviews()
            roundButton.layer.cornerRadius = roundButton.layer.frame.size.width/2
-           roundButton.backgroundColor = UIColor.lightGray
+           roundButton.backgroundColor = UIColor.systemGreen
            roundButton.clipsToBounds = true
            //roundButton.setImage(UIImage(named:"your-image"), for: .normal)
            roundButton.translatesAutoresizingMaskIntoConstraints = false
            NSLayoutConstraint.activate([
                roundButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -3),
            roundButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -53),
-           roundButton.widthAnchor.constraint(equalToConstant: 50),
-           roundButton.heightAnchor.constraint(equalToConstant: 50)])
-        roundButton.isHidden = true
+           roundButton.widthAnchor.constraint(equalToConstant: 80),
+           roundButton.heightAnchor.constraint(equalToConstant: 80)])
+        
 
        }
+    /**Volver a la pantalla de ver las imagenes a memorizar, tanto para repetir el nivel como para avanzar al siguiente nivel*/
     public func atras(level: Int){
         self.level = level
-        print("Nivel destino: \(self.level)")
         self.performSegue(withIdentifier: "replay2", sender: nil)
         
     }
+    /**Volver a la pantalla principal del juego*/
     public func home(){
-        print("entro al home")
         self.performSegue(withIdentifier: "home", sender: nil)
     }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if(segue.identifier == "replay2"){
             let playController = segue.destination as! PlayViewController
@@ -164,23 +186,26 @@ class SelectViewController: UIViewController,UICollectionViewDataSource, UIColle
             print("Nivel destino2: \(self.level)")
         }else if(segue.identifier == "home"){
             print("al menú principal del juego")
-            let homeController = segue.destination as! ViewController
+            _ = segue.destination as! ViewController
         }
             
     }
-       /** Action Handler for button **/
+       /** Acciones del boton flotante **/
 
        @IBAction func ButtonClick(_ sender: UIButton){
 
-        /** Do whatever you wanna do on button click**/
+        /** LLamar a la laerta personalizada**/
         let notesAlert = (UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "alertView") as? ResultAlertController
             )!
         notesAlert.parenViewController = self
+        /**Dependiendo de si el jugador a  acertado con el orden y la cantidad de las imagenes acertadas, mostrar una imagen y texto de los botones diferentes, en este caso solo sera el boton de reintentar y el boton de siguiente nivel. Además se le pasa el nivel actual a la alerta para avanzar o mantenerse el mismo nivel.*/
         if(checkCorrects(imagesLevel: checkOptions, imagesSelect: imagesSelected)){
             self.present(notesAlert, animated: true, completion: nil)
             notesAlert.ButtonNext.setTitle("next", for: .normal)
             notesAlert.imageResults.image = UIImage(named: "win")
             notesAlert.actualLevel = level
+            /**Comprobacion adicional para ocultar el boton de siguiente.*/
+            notesAlert.acertado = true;
         }else{
             self.present(notesAlert, animated: true, completion: nil)
             notesAlert.ButtonNext.setTitle("try", for: .normal)
@@ -190,7 +215,7 @@ class SelectViewController: UIViewController,UICollectionViewDataSource, UIColle
              
 
        }
-    
+    /**Comprueba si las imagenes selccionadas por el jugador estan en la lista de imagenes a memorizar y esten en el mismo orden*/
     func checkCorrects(imagesLevel:[String],imagesSelect: [String])->Bool{
         for i in 0..<imagesLevel.count {
             if(imagesLevel[i] != imagesSelect[i]){
