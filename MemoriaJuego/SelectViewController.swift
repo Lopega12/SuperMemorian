@@ -6,7 +6,7 @@
 //  Copyright © 2019 Loren. All rights reserved.
 //
 /**
- Controlador para la pantalla de seleccionar 
+ Controlador para la pantalla de seleccionar las imagenes para el jugador
  */
 import UIKit
 

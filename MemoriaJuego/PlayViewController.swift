@@ -6,6 +6,7 @@
 //  Copyright © 2019 Loren. All rights reserved.
 //
  import UIKit
+/**Controlador de la pantalla de visualizado de los elementos a memorizar*/
 class PlayViewController: UIViewController {
     
     /**UIimage de la imagen a memorizar*/

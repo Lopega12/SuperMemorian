@@ -18,7 +18,7 @@ class ResultAlertController: UIViewController{
     public var parenViewController: SelectViewController = SelectViewController()
     /**Valor por defecto del nivel acual del jugador en caso de que no se haya pasado.*/
     public var actualLevel = 1
-    //NIVELES QUE TIENE EL JUEGO,AL LLEGAR, EL USUARIO HA TERMINADO EL JUEGO//
+    /**Establecer el maximo de niveles del juego*/
     var maxLevel = 8
     /**Variable para determinar si ha llegado al nivel maximo del juego al acertar todas las imagenes*/
    public var acertado = false
